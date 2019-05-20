@@ -1,5 +1,8 @@
 FROM centos:7
-MAINTAINER www.ctnrs.com
+MAINTAINER azure
+
+ENV VERSION=5.6.36
+
 RUN yum install epel-release -y && \
     yum install -y gcc gcc-c++ make gd-devel libxml2-devel \
     libcurl-devel libjpeg-devel libpng-devel openssl-devel \
@@ -8,9 +11,9 @@ RUN yum install epel-release -y && \
     yum clean all && \
     rm -rf /var/cache/yum/*
 
-RUN wget http://docs.php.net/distributions/php-5.6.36.tar.gz && \
-    tar zxf php-5.6.36.tar.gz && \
-    cd php-5.6.36 && \
+RUN wget http://docs.php.net/distributions/php-${VERSION}.tar.gz && \
+    tar zxf php-${VERSION}.tar.gz && \
+    cd php-${VERSION} && \
     ./configure --prefix=/usr/local/php \
     --with-config-file-path=/usr/local/php/etc \
     --enable-fpm --enable-opcache \
@@ -27,8 +30,10 @@ RUN wget http://docs.php.net/distributions/php-5.6.36.tar.gz && \
     ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
 ENV PATH $PATH:/usr/local/php/sbin:/usr/local/php/bin
+
 COPY php.ini /usr/local/php/etc/
 COPY php-fpm.conf /usr/local/php/etc/
+
 WORKDIR /usr/local/php
 EXPOSE 9000
 CMD ["php-fpm"]
