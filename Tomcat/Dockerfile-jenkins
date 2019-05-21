@@ -1,0 +1,4 @@
+FROM tomcat:v1
+MAINTAINER azure
+RUN  wget http://mirrors.jenkins.io/war-stable/latest/jenkins.war
+COPY jenkins.war /usr/local/tomcat/webapps/ROOT.war
