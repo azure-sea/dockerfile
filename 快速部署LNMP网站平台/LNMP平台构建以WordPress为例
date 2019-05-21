@@ -1,0 +1,38 @@
+# author azure
+
+下面步骤是以上面的nginx镜像和php镜像为基础实现的.
+
+1. 创建自定义网络
+docker network create lnmp
+
+2. 创建MySQL容器
+docker run -d \
+--name lnmp_mysql \
+--net lnmp \
+--mount src=mysql-vol,dst=/var/lib/mysql \
+-e MYSQL_ROOT_PASSWORD=123456 -e MYSQL_DATABASE=wordpress mysql:5.7 --character-set-server=utf8
+
+3. 创建PHP容器
+docker run -d --name lnmp_php --net lnmp --mount src=wwwroot,dst=/wwwroot php:v1
+
+4. 创建Nginx容器
+docker run -d --name lnmp_nginx --net lnmp -p 88:80 \
+--mount type=bind,src=$(pwd)/nginx.conf,dst=/usr/local/nginx/conf/nginx.conf --mount src=wwwroot,dst=/wwwroot \
+--mount src=nginx_log,dst=/usr/local/nginx/logs nginx:v1
+
+5. 下载WordPress博客
+wget https://cn.wordpress.org/wordpress-5.0-zh_CN.tar.gz -O /var/lib/docker/volumes/wwwroot/_data/wordpress.tar.gz
+cd /var/lib/docker/volumes/wwwroot/_data/
+tar zxf wordpress.tar.gz
+
+6.访问docker宿主机的88端口
+例如192.168.180.110
+http:192.168.180.110:88/wordpress
+
+7.注意
+安装WordPress应该注意项
+MySQL 数据库账号 root 密码 123456
+连接主机为 lnmp_mysql #通过docker创建的自定义网络"lnmp"的域名进行解析.
+
+
+
